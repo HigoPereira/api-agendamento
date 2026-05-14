@@ -5,7 +5,6 @@ exports.listarAgendamentos = (req, res) => {
     res.json(agendamentos);
 };
 
-// CRIAR AGENDAMENTO
 exports.criarAgendamento = (req, res) => {
     const novoAgendamento = {
         id: agendamentos.length + 1,
