@@ -21,7 +21,4 @@ app.get('/', (req, res) => {
     res.send('API funcionando 🚀');
 });
 
-// iniciar servidor
-app.listen(3000, () => {
-    console.log('Servidor rodando em http://localhost:3000');
-});
+module.exports = app;

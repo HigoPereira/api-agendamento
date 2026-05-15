@@ -2,20 +2,27 @@ const express = require('express');
 const router = express.Router();
 
 const authMiddleware = require('../middlewares/authMiddleware');
+const servicoController = require('../controllers/servicoController');
 
-router.get('/', authMiddleware, (req, res) => {
-    res.json([
-        {
-            id: 1,
-            nome: 'Corte de cabelo',
-            preco: 30
-        },
-        {
-            id: 2,
-            nome: 'Barba',
-            preco: 20
-        }
-    ]);
-});
+// LISTAR SERVIÇOS
+router.get(
+    '/',
+    authMiddleware,
+    servicoController.listar
+);
+
+// CRIAR SERVIÇO
+router.post(
+    '/',
+    authMiddleware,
+    servicoController.criar
+);
+
+// ATUALIZAR SERVIÇO
+router.put(
+    '/:id',
+    authMiddleware,
+    servicoController.atualizar
+);
 
 module.exports = router;

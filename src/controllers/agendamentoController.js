@@ -1,63 +1,120 @@
-const agendamentos = require('../data/database');
+const db = require('../database/db');
+
+// CRIAR AGENDAMENTO
+exports.criar = (req, res) => {
+
+    const { cliente, servico, data } = req.body;
+
+    if (!cliente || !servico || !data) {
+        return res.status(400).json({
+            erro: 'Preencha todos os campos'
+        });
+    }
+
+    db.run(
+        'INSERT INTO agendamentos (cliente, servico, data) VALUES (?, ?, ?)',
+        [cliente, servico, data],
+
+        function(err) {
+
+            if (err) {
+                return res.status(500).json({
+                    erro: err.message
+                });
+            }
+
+            res.status(201).json({
+                mensagem: 'Agendamento criado com sucesso',
+                agendamento: {
+                    id: this.lastID,
+                    cliente,
+                    servico,
+                    data
+                }
+            });
+
+        }
+    );
+
+};
 
 // LISTAR AGENDAMENTOS
-exports.listarAgendamentos = (req, res) => {
-    res.json(agendamentos);
+exports.listar = (req, res) => {
+
+    db.all('SELECT * FROM agendamentos', [], (err, rows) => {
+
+        if (err) {
+            return res.status(500).json({
+                erro: err.message
+            });
+        }
+
+        res.json(rows);
+
+    });
+
 };
 
-exports.criarAgendamento = (req, res) => {
-    const novoAgendamento = {
-        id: agendamentos.length + 1,
-        nome: req.body.nome,
-        servico: req.body.servico,
-        horario: req.body.horario
-    };
+// DELETAR AGENDAMENTO
+exports.deletar = (req, res) => {
 
-    agendamentos.push(novoAgendamento);
+    const { id } = req.params;
 
-    res.status(201).json({
-        mensagem: 'Agendamento criado com sucesso!',
-        agendamento: novoAgendamento
-    });
+    db.run(
+        'DELETE FROM agendamentos WHERE id = ?',
+        [id],
+
+        function(err) {
+
+            if (err) {
+                return res.status(500).json({
+                    erro: err.message
+                });
+            }
+
+            res.json({
+                mensagem: 'Agendamento removido com sucesso'
+            });
+
+        }
+
+    );
+
 };
 
-// EDITAR AGENDAMENTO
-exports.editarAgendamento = (req, res) => {
-    const id = parseInt(req.params.id);
+// ATUALIZAR AGENDAMENTO
+exports.atualizar = (req, res) => {
 
-    const agendamento = agendamentos.find(a => a.id === id);
+    const { id } = req.params;
+    const { cliente, servico, data } = req.body;
 
-    if (!agendamento) {
-        return res.status(404).json({
-            erro: 'Agendamento não encontrado'
-        });
-    }
+    db.run(
+        `
+        UPDATE agendamentos
+        SET cliente = ?, servico = ?, data = ?
+        WHERE id = ?
+        `,
+        [cliente, servico, data, id],
 
-    agendamento.nome = req.body.nome || agendamento.nome;
-    agendamento.servico = req.body.servico || agendamento.servico;
-    agendamento.horario = req.body.horario || agendamento.horario;
+        function(err) {
 
-    res.json({
-        mensagem: 'Agendamento atualizado com sucesso!',
-        agendamento
-    });
-};
+            if (err) {
+                return res.status(500).json({
+                    erro: err.message
+                });
+            }
 
-// EXCLUIR AGENDAMENTO
-exports.excluirAgendamento = (req, res) => {
-    const id = parseInt(req.params.id);
+            res.json({
+                mensagem: 'Agendamento atualizado com sucesso',
+                agendamento: {
+                    id,
+                    cliente,
+                    servico,
+                    data
+                }
+            });
 
-    const index = agendamentos.findIndex(a => a.id === id);
+        }
+    );
 
-    if (index === -1) {
-        return res.status(404).json({
-            erro: 'Agendamento não encontrado'
-        });
-    }
-
-    agendamentos.splice(index, 1);
-
-    res.json({
-        mensagem: 'Agendamento removido com sucesso!'
-    });
 };
