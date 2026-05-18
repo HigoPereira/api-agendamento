@@ -23,10 +23,22 @@ exports.criar = (req, res) => {
     const { nome, preco } = req.body;
 
     if (!nome || !preco) {
-        return res.status(400).json({
-            erro: 'Preencha todos os campos'
-        });
-    }
+    return res.status(400).json({
+        erro: 'Preencha todos os campos'
+    });
+}
+
+if (nome.length < 3) {
+    return res.status(400).json({
+        erro: 'Nome deve ter pelo menos 3 caracteres'
+    });
+}
+
+if (preco <= 0) {
+    return res.status(400).json({
+        erro: 'Preço deve ser maior que zero'
+    });
+}
 
     db.run(
         'INSERT INTO servicos (nome, preco) VALUES (?, ?)',

@@ -6,7 +6,7 @@ exports.login = (req, res) => {
     if (usuario === 'admin' && senha === '123') {
         const token = jwt.sign(
             { usuario },
-            'segredo', // chave secreta
+           process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 

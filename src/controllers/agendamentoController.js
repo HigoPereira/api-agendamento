@@ -6,10 +6,22 @@ exports.criar = (req, res) => {
     const { cliente, servico, data } = req.body;
 
     if (!cliente || !servico || !data) {
-        return res.status(400).json({
-            erro: 'Preencha todos os campos'
-        });
-    }
+    return res.status(400).json({
+        erro: 'Preencha todos os campos'
+    });
+}
+
+if (cliente.length < 3) {
+    return res.status(400).json({
+        erro: 'Cliente deve ter pelo menos 3 caracteres'
+    });
+}
+
+if (servico.length < 3) {
+    return res.status(400).json({
+        erro: 'Serviço inválido'
+    });
+}
 
     db.run(
         'INSERT INTO agendamentos (cliente, servico, data) VALUES (?, ?, ?)',
