@@ -21,6 +21,15 @@ db.serialize(() => {
     `);
 
     db.run(`
+    CREATE TABLE IF NOT EXISTS clientes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        telefone TEXT NOT NULL,
+        email TEXT NOT NULL
+    )
+`);
+
+    db.run(`
         CREATE TABLE IF NOT EXISTS agendamentos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             cliente TEXT NOT NULL,
