@@ -1,88 +1,67 @@
-function Login() {
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; 
+import { fazerLogin } from "../services/api"; 
+
+const Login = () => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [erro, setErro] = useState("");
+  
+  const navigate = useNavigate();
+
+  // 2. A função que roda quando o usuário clica no botão "Entrar"
+  const handleLogin = async (e) => {
+    e.preventDefault(); 
+    setErro(""); 
+
+    try {
+      const resposta = await fazerLogin(username, password);
+
+      localStorage.setItem("@AgendiFy:token", resposta.access_token);
+
+      alert("Login realizado com sucesso!");
+      
+      // 4. Redireciona o usuário para a página principal (Dashboard, Home, etc.)
+      navigate("/dashboard"); 
+
+    } catch (error) {
+      console.error("Erro no login:", error);
+      setErro("Usuário ou senha incorretos. Tente novamente.");
+    }
+  };
+
   return (
-    <div
-      style={{
-        height: "100vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "#fff",
-          padding: "40px",
-          borderRadius: "16px",
-          width: "400px",
-          boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
-        }}
-      >
-        <h1
-          style={{
-            textAlign: "center",
-            marginBottom: "20px",
-            color: "#1e3a8a",
-            lineHeight: "1.4",
-          }}
-        >
-          Sistema de Agendamento
-        </h1>
+    <div className="login-container">
+      <h2>Entrar no AgendiFy</h2>
+      
+      {/* Mostra mensagem de erro se as credenciais estiverem erradas */}
+      {erro && <p style={{ color: "red" }}>{erro}</p>}
 
-        <p
-          style={{
-            textAlign: "center",
-            marginBottom: "35px",
-            color: "#666",
-          }}
-        >
-          Gerencie empresas, profissionais e serviços
-        </p>
+      <form onSubmit={handleLogin}>
+        <div>
+          <label>Usuário:</label>
+          <input 
+            type="text" 
+            value={username} 
+            onChange={(e) => setUsername(e.target.value)} 
+            required 
+          />
+        </div>
 
-        <input
-          type="email"
-          placeholder="Digite seu e-mail"
-          style={{
-            width: "100%",
-            padding: "12px",
-            marginBottom: "15px",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            fontSize: "14px",
-          }}
-        />
+        <div>
+          <label>Senha:</label>
+          <input 
+            type="password" 
+            value={password} 
+            onChange={(e) => setPassword(e.target.value)} 
+            required 
+          />
+        </div>
 
-        <input
-          type="password"
-          placeholder="Digite sua senha"
-          style={{
-            width: "100%",
-            padding: "12px",
-            marginBottom: "20px",
-            border: "1px solid #ccc",
-            borderRadius: "8px",
-            fontSize: "14px",
-          }}
-        />
-
-        <button
-          style={{
-            width: "100%",
-            padding: "12px",
-            border: "none",
-            borderRadius: "8px",
-            backgroundColor: "#2563eb",
-            color: "#fff",
-            fontSize: "16px",
-            fontWeight: "bold",
-            cursor: "pointer",
-            transition: "0.3s",
-          }}
-        >
-          Entrar
-        </button>
-      </div>
+        <button type="submit">Entrar</button>
+      </form>
     </div>
   );
-}
+};
 
 export default Login;
