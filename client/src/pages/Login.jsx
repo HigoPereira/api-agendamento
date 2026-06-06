@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./Login.css"; 
 import { useNavigate } from "react-router-dom"; 
 import { fazerLogin } from "../services/api"; 
 
@@ -9,7 +10,6 @@ const Login = () => {
   
   const navigate = useNavigate();
 
-  // 2. A função que roda quando o usuário clica no botão "Entrar"
   const handleLogin = async (e) => {
     e.preventDefault(); 
     setErro(""); 
@@ -21,7 +21,6 @@ const Login = () => {
 
       alert("Login realizado com sucesso!");
       
-      // 4. Redireciona o usuário para a página principal (Dashboard, Home, etc.)
       navigate("/dashboard"); 
 
     } catch (error) {
@@ -31,35 +30,48 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <h2>Entrar no AgendiFy</h2>
-      
-      {/* Mostra mensagem de erro se as credenciais estiverem erradas */}
-      {erro && <p style={{ color: "red" }}>{erro}</p>}
-
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>Usuário:</label>
-          <input 
-            type="text" 
-            value={username} 
-            onChange={(e) => setUsername(e.target.value)} 
-            required 
-          />
+    <div className="login-wrapper">
+      <div className="login-card">
+        
+        <div className="login-header">
+          <h2>Entrar no AgendiFy</h2>
+          <p>Acesse sua conta para continuar</p>
         </div>
+        
+        {/* Mostra mensagem de erro se as credenciais estiverem erradas */}
+        {erro && <div className="error-message">{erro}</div>}
 
-        <div>
-          <label>Senha:</label>
-          <input 
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
-          />
-        </div>
+        <form onSubmit={handleLogin}>
+          <div className="input-group">
+            <label className="form-label">Usuário</label>
+            <input 
+              className="form-control"
+              type="text" 
+              value={username} 
+              onChange={(e) => setUsername(e.target.value)} 
+              placeholder="Digite seu usuário"
+              required 
+            />
+          </div>
 
-        <button type="submit">Entrar</button>
-      </form>
+          <div className="input-group">
+            <label className="form-label">Senha</label>
+            <input 
+              className="form-control"
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              placeholder="Digite sua senha"
+              required 
+            />
+          </div>
+
+          <button type="submit" className="btn-login">
+            Entrar
+          </button>
+        </form>
+
+      </div>
     </div>
   );
 };
