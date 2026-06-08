@@ -7,24 +7,28 @@ import Profissionais from "./pages/Profissionais";
 import Servicos from "./pages/Servicos";
 import NovaEmpresa from "./pages/NovaEmpresa";
 
-import { EmpresaProvider } from "./context/EmpresaContext";
 
 function App() {
   return (
-    <EmpresaProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+    <BrowserRouter>
+      {/* Removemos aquele <EmpresaProvider> que envelopava tudo aqui */}
+      <Routes>
+        {/* Rota Pública */}
+        <Route path="/" element={<Login />} />
 
-          <Route path="/empresas" element={<Empresas />} />
-          <Route path="/empresas/nova" element={<NovaEmpresa />} />
+        {/* Rotas Privadas (Painel) */}
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/empresas" element={<Empresas />} />
+        <Route path="/profissionais" element={<Profissionais />} />
+        <Route path="/servicos" element={<Servicos />} />
+        <Route path="/empresa/nova" element={<NovaEmpresa/>}/>
 
-          <Route path="/profissionais" element={<Profissionais />} />
-          <Route path="/servicos" element={<Servicos />} />
-        </Routes>
-      </BrowserRouter>
-    </EmpresaProvider>
+        {/* Rotas de Criação (Desativadas até construirmos as telas) */}
+        {/* <Route path="/empresas/nova" element={<NovaEmpresa />} /> */}
+        {/* <Route path="/profissionais/novo" element={<NovoProfissional />} /> */}
+        {/* <Route path="/servicos/novo" element={<NovoServico />} /> */}
+      </Routes>
+    </BrowserRouter>
   );
 }
 

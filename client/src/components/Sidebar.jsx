@@ -1,75 +1,43 @@
-import { Link } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import "./Sidebar.css";
 
 function Sidebar() {
+  const navigate = useNavigate();
+
+  // Função para deslogar do sistema
+  const handleLogout = () => {
+    // Apaga a chave de segurança do cofre do navegador
+    localStorage.removeItem("@AgendiFy:token");
+    navigate("/"); 
+  };
+
   return (
-    <div
-      style={{
-        width: "250px",
-        height: "100vh",
-        backgroundColor: "#1e3a8a",
-        color: "white",
-        padding: "20px",
-        position: "fixed",
-        left: 0,
-        top: 0,
-      }}
-    >
-      <h2
-        style={{
-          textAlign: "center",
-          marginBottom: "40px",
-        }}
-      >
-        Agendamento
-      </h2>
+    <div className="sidebar">
+      <div className="sidebar-brand">
+        AgendiFy
+      </div>
 
-      <nav
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "15px",
-        }}
-      >
-        <Link
-          to="/dashboard"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
-        >
-          Dashboard
-        </Link>
+      <nav className="sidebar-nav">
+        <NavLink to="/dashboard" className="nav-item">
+           Dashboard
+        </NavLink>
 
-        <Link
-          to="/empresas"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
-        >
-          Empresas
-        </Link>
+        <NavLink to="/empresas" className="nav-item">
+           Empresas
+        </NavLink>
 
-        <Link
-          to="/profissionais"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
-        >
-          Profissionais
-        </Link>
+        <NavLink to="/profissionais" className="nav-item">
+           Profissionais
+        </NavLink>
 
-        <Link
-          to="/servicos"
-          style={{
-            color: "white",
-            textDecoration: "none",
-          }}
-        >
-          Serviços
-        </Link>
+        <NavLink to="/servicos" className="nav-item">
+           Serviços
+        </NavLink>
       </nav>
+
+      <button className="logout-btn" onClick={handleLogout}>
+        Sair do Sistema
+      </button>
     </div>
   );
 }

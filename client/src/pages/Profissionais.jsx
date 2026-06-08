@@ -1,87 +1,103 @@
-import Sidebar from "../components/Sidebar";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Layout from "../components/Layout"; 
+import api from "../services/api"; 
+import "./Profissionais.css"; 
 
 function Profissionais() {
+  const navigate = useNavigate();
+  
+  const [profissionais, setProfissionais] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    carregarProfissionais();
+  }, []);
+
+  const carregarProfissionais = async () => {
+    try {
+      setCarregando(true);
+      const resposta = await api.get("/profissionais/");
+      setProfissionais(resposta.data.results || resposta.data);
+    } catch (error) {
+      console.error("Erro ao buscar profissionais:", error);
+      alert("Falha ao carregar a lista de profissionais.");
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  const handleDeletar = async (id) => {
+    const confirmar = window.confirm("Tem certeza que deseja excluir este profissional?");
+    if (!confirmar) return;
+
+    try {
+      await api.delete(`/profissionais/${id}/`);
+      setProfissionais(profissionais.filter((prof) => prof.id !== id));
+      alert("Profissional excluído com sucesso!");
+    } catch (error) {
+      console.error("Erro ao deletar:", error);
+      alert("Erro ao excluir. Verifique as permissões.");
+    }
+  };
+
   return (
-    <>
-      <Sidebar />
-
-      <div
-        style={{
-          minHeight: "100vh",
-          backgroundColor: "#f4f6f9",
-          marginLeft: "250px",
-          padding: "40px",
-        }}
-      >
-        <h1
-          style={{
-            color: "#1e3a8a",
-            marginBottom: "25px",
-          }}
-        >
-          Profissionais
-        </h1>
-
-        <button
-          style={{
-            backgroundColor: "#2563eb",
-            color: "#fff",
-            border: "none",
-            padding: "12px 20px",
-            borderRadius: "8px",
-            cursor: "pointer",
-            marginBottom: "20px",
-          }}
+    <Layout>
+      <div className="page-header">
+        <h1 className="page-title">Profissionais</h1>
+        <button 
+          className="btn-primary"
+          onClick={() => navigate("/profissionais/novo")}
         >
           + Novo Profissional
         </button>
+      </div>
 
-        <div
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: "12px",
-            padding: "20px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          }}
-        >
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-            }}
-          >
+      <div className="table-container">
+        {carregando ? (
+          <div className="loading-state">Buscando dados no servidor...</div>
+        ) : (
+          <table className="data-table">
             <thead>
               <tr>
-                <th style={{ textAlign: "left", padding: "12px" }}>ID</th>
-                <th style={{ textAlign: "left", padding: "12px" }}>Nome</th>
-                <th style={{ textAlign: "left", padding: "12px" }}>Cargo</th>
-                <th style={{ textAlign: "left", padding: "12px" }}>Ações</th>
+                <th>ID</th>
+                <th>Nome</th>
+                {/* O nome do campo pode variar no seu models.py */}
+                <th>Cargo / Especialidade</th>
+                <th>Ações</th>
               </tr>
             </thead>
-
+            
             <tbody>
-              <tr>
-                <td style={{ padding: "12px" }}>1</td>
-                <td style={{ padding: "12px" }}>Higo Alves</td>
-                <td style={{ padding: "12px" }}>Barbeiro</td>
-                <td style={{ padding: "12px" }}>
-                  <button>Editar</button>
-                </td>
-              </tr>
-
-              <tr>
-                <td style={{ padding: "12px" }}>2</td>
-                <td style={{ padding: "12px" }}>Pablo Henrique</td>
-                <td style={{ padding: "12px" }}>Cabeleireiro</td>
-                <td style={{ padding: "12px" }}>
-                  <button>Editar</button>
-                </td>
-              </tr>
+              {profissionais.length > 0 ? (
+                profissionais.map((profissional) => (
+                  <tr key={profissional.id}>
+                    <td>{profissional.id}</td>
+                    <td>{profissional.nome}</td>
+                    {/* Renderiza 'cargo' ou 'especialidade' */}
+                    <td>{profissional.cargo || profissional.especialidade || "-"}</td>
+                    <td>
+                      <button 
+                        className="btn-danger"
+                        onClick={() => handleDeletar(profissional.id)}
+                      >
+                        Excluir
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" style={{ textAlign: "center", padding: "30px", color: "#64748b" }}>
+                    Nenhum profissional cadastrado ainda.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
-        </div>
+        )}
       </div>
-    </>
+    </Layout>
   );
 }
 

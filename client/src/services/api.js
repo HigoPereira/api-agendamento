@@ -19,9 +19,9 @@ export const fazerLogin = async (username, password) => {
   dadosLogin.append('username', username);
   dadosLogin.append('password', password);
   
-  // ATENÇÃO: Cole suas chaves geradas no painel do Django aqui
-  dadosLogin.append('client_id', 'SEU_CLIENT_ID_AQUI');
-  dadosLogin.append('client_secret', 'SEU_CLIENT_SECRET_AQUI');
+  // ATENÇÃO: Retorno de chaves privadas
+  dadosLogin.append('client_id', import.meta.env.VITE_CLIENT_ID);
+  dadosLogin.append('client_secret', import.meta.env.VITE_CLIENT_SECRET);
 
   // A requisição bate na rota de token (igualzinho fizemos no Python)
   const resposta = await axios.post('http://localhost:8000/o/token/', dadosLogin, {

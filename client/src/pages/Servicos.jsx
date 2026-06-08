@@ -1,87 +1,114 @@
-import Sidebar from "../components/Sidebar";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Layout from "../components/Layout"; 
+import api from "../services/api"; 
+import "./Servicos.css"; 
 
 function Servicos() {
+  const navigate = useNavigate();
+  
+  // 1. Estados
+  const [servicos, setServicos] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+
+  // 2. Busca ao carregar a página
+  useEffect(() => {
+    carregarServicos();
+  }, []);
+
+  const carregarServicos = async () => {
+    try {
+      setCarregando(true);
+      const resposta = await api.get("/servicos/");
+      setServicos(resposta.data.results || resposta.data);
+    } catch (error) {
+      console.error("Erro ao buscar serviços:", error);
+      alert("Falha ao carregar a lista de serviços.");
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  // 3. Função de Exclusão
+  const handleDeletar = async (id) => {
+    const confirmar = window.confirm("Tem certeza que deseja excluir este serviço?");
+    if (!confirmar) return;
+
+    try {
+      await api.delete(`/servicos/${id}/`);
+      setServicos(servicos.filter((servico) => servico.id !== id));
+      alert("Serviço excluído com sucesso!");
+    } catch (error) {
+      console.error("Erro ao deletar:", error);
+      alert("Erro ao excluir. Verifique as permissões.");
+    }
+  };
+
+  // 4. Formatador de Moeda (Transforma 30 em R$ 30,00)
+  const formatarValor = (valor) => {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    }).format(valor);
+  };
+
   return (
-    <>
-      <Sidebar />
-
-      <div
-        style={{
-          minHeight: "100vh",
-          backgroundColor: "#f4f6f9",
-          marginLeft: "250px",
-          padding: "40px",
-        }}
-      >
-        <h1
-          style={{
-            color: "#1e3a8a",
-            marginBottom: "25px",
-          }}
-        >
-          Serviços
-        </h1>
-
-        <button
-          style={{
-            backgroundColor: "#2563eb",
-            color: "#fff",
-            border: "none",
-            padding: "12px 20px",
-            borderRadius: "8px",
-            cursor: "pointer",
-            marginBottom: "20px",
-          }}
+    <Layout>
+      <div className="page-header">
+        <h1 className="page-title">Serviços</h1>
+        <button 
+          className="btn-primary"
+          onClick={() => navigate("/servicos/novo")}
         >
           + Novo Serviço
         </button>
+      </div>
 
-        <div
-          style={{
-            backgroundColor: "#fff",
-            borderRadius: "12px",
-            padding: "20px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          }}
-        >
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-            }}
-          >
+      <div className="table-container">
+        {carregando ? (
+          <div className="loading-state">Buscando dados no servidor...</div>
+        ) : (
+          <table className="data-table">
             <thead>
               <tr>
-                <th style={{ textAlign: "left", padding: "12px" }}>ID</th>
-                <th style={{ textAlign: "left", padding: "12px" }}>Serviço</th>
-                <th style={{ textAlign: "left", padding: "12px" }}>Valor</th>
-                <th style={{ textAlign: "left", padding: "12px" }}>Ações</th>
+                <th>ID</th>
+                {/* Ajuste o nome do campo abaixo se no seu Django ele se chamar "nome" em vez de "servico" */}
+                <th>Serviço</th> 
+                <th>Valor</th>
+                <th>Ações</th>
               </tr>
             </thead>
-
+            
             <tbody>
-              <tr>
-                <td style={{ padding: "12px" }}>1</td>
-                <td style={{ padding: "12px" }}>Corte Masculino</td>
-                <td style={{ padding: "12px" }}>R$ 30,00</td>
-                <td style={{ padding: "12px" }}>
-                  <button>Editar</button>
-                </td>
-              </tr>
-
-              <tr>
-                <td style={{ padding: "12px" }}>2</td>
-                <td style={{ padding: "12px" }}>Barba</td>
-                <td style={{ padding: "12px" }}>R$ 20,00</td>
-                <td style={{ padding: "12px" }}>
-                  <button>Editar</button>
-                </td>
-              </tr>
+              {servicos.length > 0 ? (
+                servicos.map((servico) => (
+                  <tr key={servico.id}>
+                    <td>{servico.id}</td>
+                    {/* Aqui renderizamos os campos reais do banco. Se for 'nome' e 'preco', mude aqui */}
+                    <td>{servico.nome || servico.descricao || "-"}</td>
+                    <td>{formatarValor(servico.valor || servico.preco || 0)}</td>
+                    <td>
+                      <button 
+                        className="btn-danger"
+                        onClick={() => handleDeletar(servico.id)}
+                      >
+                        Excluir
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" style={{ textAlign: "center", padding: "30px", color: "#64748b" }}>
+                    Nenhum serviço cadastrado ainda.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
-        </div>
+        )}
       </div>
-    </>
+    </Layout>
   );
 }
 

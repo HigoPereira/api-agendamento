@@ -1,124 +1,88 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useState, useContext } from "react";
 import Layout from "../components/Layout";
-import { EmpresaContext } from "../context/EmpresaContext";
+import api from "../services/api";
+import "./Formularios.css"; 
 
 function NovaEmpresa() {
   const navigate = useNavigate();
-  const { adicionarEmpresa } = useContext(EmpresaContext);
-
+  
   const [nome, setNome] = useState("");
   const [cnpj, setCnpj] = useState("");
+  const [salvando, setSalvando] = useState(false);
 
-  function salvar() {
-    if (!nome || !cnpj) return;
+  const handleSalvar = async (e) => {
+    e.preventDefault(); 
+    setSalvando(true);
 
-    adicionarEmpresa({
-      nome,
-      cnpj,
-    });
+    try {
+      // Manda os dados para a API do Django
+      await api.post("/empresas/", {
+        nome: nome,
+        cnpj: cnpj
+      });
 
-    navigate("/empresas");
-  }
+      alert("Empresa cadastrada com sucesso!");
+      // Volta para a tabela de listagem
+      navigate("/empresas"); 
+    } catch (error) {
+      console.error("Erro ao salvar:", error);
+      alert("Erro ao cadastrar empresa. Verifique os dados.");
+    } finally {
+      setSalvando(false);
+    }
+  };
 
   return (
     <Layout>
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "70vh",
-        }}
-      >
-        <div
-          style={{
-            backgroundColor: "#fff",
-            padding: "30px",
-            borderRadius: "14px",
-            boxShadow: "0 8px 20px rgba(0,0,0,0.1)",
-            width: "100%",
-            maxWidth: "500px",
-          }}
-        >
-          <h2
-            style={{
-              marginBottom: "20px",
-              color: "#1e3a8a",
-            }}
-          >
-            Criar Nova Empresa
-          </h2>
+      <div className="page-header">
+        <h1 className="page-title">Nova Empresa</h1>
+      </div>
 
-          <input
-            placeholder="Nome da empresa"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px",
-              marginBottom: "12px",
-              borderRadius: "8px",
-              border: "1px solid #d1d5db",
-              outline: "none",
-            }}
-          />
+      <div className="form-container">
+        <form onSubmit={handleSalvar}>
+          
+          <div className="form-group">
+            <label>Nome da Empresa</label>
+            <input 
+              type="text" 
+              placeholder="Ex: Barbearia do Higo"
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              required
+            />
+          </div>
 
-          <input
-            placeholder="CNPJ"
-            value={cnpj}
-            onChange={(e) => setCnpj(e.target.value)}
-            style={{
-              width: "100%",
-              padding: "12px",
-              marginBottom: "20px",
-              borderRadius: "8px",
-              border: "1px solid #d1d5db",
-              outline: "none",
-            }}
-          />
+          <div className="form-group">
+            <label>CNPJ</label>
+            <input 
+              type="text" 
+              placeholder="00.000.000/0000-00"
+              value={cnpj}
+              onChange={(e) => setCnpj(e.target.value)}
+              required
+            />
+          </div>
 
-          <div
-            style={{
-              display: "flex",
-              gap: "10px",
-            }}
-          >
-            {/* BOTÃO VOLTAR */}
-            <button
+          <div className="form-actions">
+            <button 
+              type="button" 
+              className="btn-cancel"
               onClick={() => navigate("/empresas")}
-              style={{
-                flex: 1,
-                padding: "12px",
-                border: "1px solid #d1d5db",
-                borderRadius: "8px",
-                backgroundColor: "#f3f4f6",
-                color: "#111827",
-                cursor: "pointer",
-                fontWeight: "500",
-              }}
             >
-              Voltar
+              Cancelar
             </button>
-
-            {/* BOTÃO SALVAR */}
-            <button
-              onClick={salvar}
-              style={{
-                flex: 1,
-                padding: "12px",
-                border: "none",
-                borderRadius: "8px",
-                backgroundColor: "#2563eb",
-                color: "#fff",
-                cursor: "pointer",
-                fontWeight: "500",
-              }}
+            
+            <button 
+              type="submit" 
+              className="btn-submit"
+              disabled={salvando}
             >
-              Salvar
+              {salvando ? "Salvando no banco..." : "Salvar Empresa"}
             </button>
           </div>
-        </div>
+
+        </form>
       </div>
     </Layout>
   );

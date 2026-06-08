@@ -1,21 +1,16 @@
 import Sidebar from "./Sidebar";
+import "./Layout.css";
 
 function Layout({ children }) {
   return (
-    <>
+    <div className="layout-wrapper">
       <Sidebar />
-
-      <div
-        style={{
-          minHeight: "100vh",
-          backgroundColor: "#f4f6f9",
-          marginLeft: "250px",
-          padding: "40px",
-        }}
-      >
+      
+      {}
+      <main className="layout-main">
         {children}
-      </div>
-    </>
+      </main>
+    </div>
   );
 }
 
